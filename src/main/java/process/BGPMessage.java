@@ -96,6 +96,16 @@ public class BGPMessage {
     }
 
     public BGPMessage cleanLoops() {
+        path = clean(path);
+        return this;
+    }
+
+    public static List<Integer> cleanLoops(List<Integer> path) {
+        path = clean(path);
+        return path;
+    }
+
+    private static List<Integer> clean(List<Integer> path) {
         Collections.reverse(path);
         List<Integer> newSeqInv = new ArrayList<>();
 
@@ -106,6 +116,6 @@ public class BGPMessage {
         }
         Collections.reverse(newSeqInv);
         path = newSeqInv;
-        return this;
+        return path;
     }
 }
