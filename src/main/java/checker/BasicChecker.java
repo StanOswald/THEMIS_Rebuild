@@ -1,4 +1,4 @@
-package algorithm;
+package checker;
 
 import process.BGPMessage;
 import process.DetectionResult;

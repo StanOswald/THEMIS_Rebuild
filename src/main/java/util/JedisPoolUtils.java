@@ -25,7 +25,7 @@ public class JedisPoolUtils {
     public static Jedis getResource(int index) {
         Jedis resource = jedisPool.getResource();
         resource.select(index);
-        logger.info("Get resource from pool: " + resource);
+        logger.info("Get resource(DB-" + resource.getDB() + ") from pool: " + resource.hashCode());
         return resource;
     }
 }

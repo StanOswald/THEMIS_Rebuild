@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface RedisMapper {
 
+    List<Integer> findLocalPath(String prefix);
+
     List<Integer> getOriginalPaths(int ASnL, int ASnR);
 
     List<Integer> getHistoryPaths(int srcASn, int peerASn);
@@ -17,4 +19,6 @@ public interface RedisMapper {
     String getIP(int ASn);
 
     void setASAndIP(int ASn, String IP);
+
+    void saveNewPath(String prefix, List<Integer> newPath);
 }
