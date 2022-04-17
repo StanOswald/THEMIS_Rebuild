@@ -10,7 +10,7 @@ import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.XReadGroupParams;
 import redis.clients.jedis.resps.StreamEntry;
-import util.JedisPoolUtils;
+import util.RedisPool;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class Main {
         int turn = 0;
         //xadd bgp_message * msg "{\"type\":\"A\",\"timestamp\":1635594484.4040916,\"peer_asn\":100,\"host\":\"\",\"path\":[100,100,200,300,400],\"communities\":[],\"prefix\":[\"10.0.0.0/8\",\"20.0.0.0/16\"]}"
 
-        try (Jedis resource = JedisPoolUtils.getResource()) {
+        try (Jedis resource = RedisPool.getMessageConnection()) {
 
             ObjectMapper objectMapper = new ObjectMapper();
             List<Map.Entry<String, List<StreamEntry>>> list;

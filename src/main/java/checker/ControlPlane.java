@@ -1,24 +1,13 @@
 package checker;
 
 import algorithm.Detection;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.RedisMapper;
 import dao.impl.RedisMapperImpl;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import process.BGPMessage;
 import process.DetectionResult;
-import redis.clients.jedis.Jedis;
-import util.JedisPoolUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ControlPlane extends Detection implements BasicChecker {
@@ -33,10 +22,10 @@ public class ControlPlane extends Detection implements BasicChecker {
         List<Integer> path = message.getPath();
         int lastASn = path.get(path.size() - 1);
 
-        for (String prefix : message.getPrefixes()) {
-            if (!getAnnouncedPrefixes(lastASn).contains(prefix))
-                return new DetectionResult(true, "Prefix hijacking", lastASn, 1, 2, 3);
+        if (!isSource(lastASn, message.getPrefixes()))
+            return new DetectionResult(true, "Prefix hijacking", lastASn, 1, 2, 3);
 
+        for (String prefix : message.getPrefixes()) {
             List<Integer> localPath = mapper.findLocalPath(prefix);
             if (localPath == null) {
                 mapper.saveNewPath(prefix, path);

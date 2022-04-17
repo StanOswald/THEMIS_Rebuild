@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import process.BGPMessage;
 import redis.clients.jedis.Jedis;
-import util.JedisPoolUtils;
+import util.RedisPool;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,8 +20,8 @@ import java.util.Map;
 public class DataCollector extends WebSocketClient {
 
     private final Logger logger = LoggerFactory.getLogger(DataCollector.class);
-    private final Jedis pathResource = JedisPoolUtils.getResource(1);
-    private final Jedis histResource = JedisPoolUtils.getResource(2);
+    private final Jedis pathConn = RedisPool.getPathConnection();
+    private final Jedis histConn = RedisPool.getHistoryConnection();
 
     public DataCollector(URI serverUri) {
         super(serverUri);
@@ -38,7 +38,7 @@ public class DataCollector extends WebSocketClient {
                     "data", Map.of(
                             "type", "UPDATE",
                             "moreSpecific", true,
-                            "host", "rrc21",
+                            // "host", "rrc21",
                             "require", "announcements"
                     )
             )));
@@ -56,12 +56,12 @@ public class DataCollector extends WebSocketClient {
 
             List<Integer> p = message.path;
             int last = p.size() - 1;
-            histResource.sadd(p.get(0) + "_" + p.get(last), p.toString());
+            histConn.sadd(p.get(0) + "_" + p.get(last), p.toString());
 
             for (int i = 0; i < last; i++) {
                 int ASn = p.get(i);
                 int nextASn = p.get(i + 1);
-                pathResource.sadd(ASn + "_" + nextASn, p.toString());
+                pathConn.sadd(ASn + "_" + nextASn, p.toString());
             }
         } catch (IOException | NullPointerException e) {
             logger.info(s);
@@ -72,8 +72,8 @@ public class DataCollector extends WebSocketClient {
     @Override
     public void onClose(int i, String s, boolean b) {
         logger.info("Websocket closed");
-        histResource.close();
-        pathResource.close();
+        histConn.close();
+        pathConn.close();
     }
 
     @Override

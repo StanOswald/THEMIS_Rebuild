@@ -38,6 +38,15 @@ public class Detection {
         return prefixesArr;
     }
 
+    protected boolean isSource(Integer ASn, List<String> prefixes) {
+        List<String> announcedPrefixes = getAnnouncedPrefixes(ASn);
+        for (String prefix : prefixes) {
+            if (announcedPrefixes.contains(prefix))
+                return true;
+        }
+        return false;
+    }
+
     protected List<Integer> findChangePoint(List<Integer> localPath, List<Integer> newPath) {
         int localPathLen = localPath.size();
         int newPathLen = newPath.size();
@@ -55,7 +64,7 @@ public class Detection {
                 && localPath.get(localPathLen + right).equals(newPath.get(newPathLen + right))) {
             right--;
         }
-
+        right+=newPathLen;
         return left == right ? List.of(newPath.get(left)) : newPath.subList(left, right + 1);
     }
 }

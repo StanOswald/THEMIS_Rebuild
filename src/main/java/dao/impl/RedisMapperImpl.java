@@ -4,24 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.RedisMapper;
 import redis.clients.jedis.Jedis;
-import util.JedisPoolUtils;
+import util.RedisPool;
 
 import java.util.List;
 
 public class RedisMapperImpl implements RedisMapper {
 
-    private static final Jedis ctrlResource = JedisPoolUtils.getResource(8);
-
     @Override
     public List<Integer> findLocalPath(String prefix) {
-        // Find path by prefix from local
-        String path = ctrlResource.get(prefix);
-        try {
+        try (Jedis ctrlConn = RedisPool.getControlConnection()) {
+            String path = ctrlConn.get(prefix);
             return new ObjectMapper().readerFor(List.class).readValue(path);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | IllegalArgumentException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -61,6 +58,8 @@ public class RedisMapperImpl implements RedisMapper {
 
     @Override
     public void saveNewPath(String prefix, List<Integer> newPath) {
-        ctrlResource.set(prefix, String.valueOf(newPath));
+        try (Jedis ctrlConn = RedisPool.getControlConnection()) {
+            ctrlConn.set(prefix, String.valueOf(newPath));
+        }
     }
 }
