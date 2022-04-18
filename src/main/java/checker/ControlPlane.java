@@ -22,7 +22,7 @@ public class ControlPlane extends Detection implements BasicChecker {
         List<Integer> path = message.getPath();
         int lastASn = path.get(path.size() - 1);
 
-        if (!isSource(lastASn, message.getPrefixes()))
+        if (isNotSource(lastASn, message.getPrefixes()))
             return new DetectionResult(true, "Prefix hijacking", lastASn, 1, 2, 3);
 
         for (String prefix : message.getPrefixes()) {

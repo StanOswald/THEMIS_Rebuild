@@ -2,16 +2,23 @@ package algorithm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dao.RedisMapper;
+import dao.impl.RedisMapperImpl;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Detection {
+
+    private final RedisMapper redisMapper = new RedisMapperImpl();
+
     protected List<String> getAnnouncedPrefixes(Integer ASn) {
         List<String> prefixesArr = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,13 +45,13 @@ public class Detection {
         return prefixesArr;
     }
 
-    protected boolean isSource(Integer ASn, List<String> prefixes) {
+    protected boolean isNotSource(Integer ASn, List<String> prefixes) {
         List<String> announcedPrefixes = getAnnouncedPrefixes(ASn);
         for (String prefix : prefixes) {
             if (announcedPrefixes.contains(prefix))
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
 
     protected List<Integer> findChangePoint(List<Integer> localPath, List<Integer> newPath) {
@@ -64,7 +71,30 @@ public class Detection {
                 && localPath.get(localPathLen + right).equals(newPath.get(newPathLen + right))) {
             right--;
         }
-        right+=newPathLen;
+        right += newPathLen;
         return left == right ? List.of(newPath.get(left)) : newPath.subList(left, right + 1);
+    }
+
+    protected boolean connectivityCheck(int ASn) {
+        String ip = redisMapper.getIP(ASn);
+        try {
+            InetAddress address = Inet4Address.getByName(ip);
+            return address.isReachable(2000);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    protected boolean BGPCheck(List<Integer> path, List<String> prefixes) {
+        int last = path.size() - 1;
+        if (isNotSource(path.get(last), prefixes))
+            return false;
+
+        for (int i = 1; i < last; i++) {
+            if (!redisMapper.isAdjacent(path.get(i), path.get(i - 1))
+                    || !redisMapper.isPolicyRelativeCorrect(path.get(i), path.get(i - 1)))
+                return false;
+        }
+        return true;
     }
 }
