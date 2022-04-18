@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
 public class DataCollector extends WebSocketClient {
 
@@ -31,20 +30,14 @@ public class DataCollector extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         logger.info("Websocket opened");
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            this.send(mapper.writeValueAsString(Map.of(
-                    "type", "ris_subscribe",
-                    "data", Map.of(
-                            "type", "UPDATE",
-                            "moreSpecific", true,
-                            // "host", "rrc21",
-                            "require", "announcements"
-                    )
-            )));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        this.send("""
+                {
+                    "type": "ris_subscribe",
+                    "data": {
+                        "host": "rrc21",
+                        "path": 3356
+                    }
+                }""");
     }
 
     @Override
