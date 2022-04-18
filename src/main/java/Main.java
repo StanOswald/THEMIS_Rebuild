@@ -10,7 +10,7 @@ import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.XReadGroupParams;
 import redis.clients.jedis.resps.StreamEntry;
-import util.RedisPool;
+import dao.RedisPool;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,6 @@ public class Main {
                     logger.info(msgId);
                     ControlPlane controlPlane = new ControlPlane();
                     HijackChecker controlPlaneChecker = new HijackChecker(controlPlane, msgObj);
-
 
                     Thread t1 = new Thread(controlPlaneChecker);
                     t1.start();
