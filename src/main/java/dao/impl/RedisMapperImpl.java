@@ -7,6 +7,7 @@ import redis.clients.jedis.Jedis;
 import util.RedisPool;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RedisMapperImpl implements RedisMapper {
 
@@ -23,37 +24,52 @@ public class RedisMapperImpl implements RedisMapper {
 
     @Override
     public List<Integer> getOriginalPaths(int ASnL, int ASnR) {
-        return null;
+        try (Jedis pathConn = RedisPool.getPathConnection()) {
+            return pathConn.smembers(ASnL + "_" + ASnR).stream()
+                    .map(Integer::parseInt).collect(Collectors.toList());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
     public List<Integer> getHistoryPaths(int srcASn, int peerASn) {
-        return null;
+        try (Jedis historyConn = RedisPool.getHistoryConnection()) {
+            return historyConn.smembers(srcASn + "_" + peerASn).stream()
+                    .map(Integer::parseInt).collect(Collectors.toList());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
     public boolean isPolicyRelativeCorrect(int ASnX, int ASnY) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAdjacent(int ASnX, int ASnY) {
-        return false;
-    }
-
-    @Override
-    public boolean isSource(int ASn, List<Integer> prefixes) {
-        return false;
+        try (Jedis pathConn = RedisPool.getPathConnection()) {
+            return (pathConn.hget(String.valueOf(ASnX), String.valueOf(ASnY)) != null);
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     @Override
     public String getIP(int ASn) {
-        return null;
+        try (Jedis ASIPConn = RedisPool.getASIPConnection()) {
+            return ASIPConn.smembers(String.valueOf(ASn)).iterator().next();
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
     public void setASAndIP(int ASn, String IP) {
-
+        try (Jedis ASIPConn = RedisPool.getASIPConnection()) {
+            ASIPConn.sadd(String.valueOf(ASn), IP);
+        }
     }
 
     @Override

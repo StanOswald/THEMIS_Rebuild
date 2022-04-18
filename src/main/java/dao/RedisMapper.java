@@ -14,8 +14,6 @@ public interface RedisMapper {
 
     boolean isAdjacent(int ASnX, int ASnY);
 
-    boolean isSource(int ASn, List<Integer> prefixes);
-
     String getIP(int ASn);
 
     void setASAndIP(int ASn, String IP);
