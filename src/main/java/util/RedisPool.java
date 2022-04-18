@@ -8,9 +8,10 @@ import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisPool {
 
-    public static final int BGP_MESSAGE_INDEX = 1;
+    public static final int BGP_MESSAGE_INDEX = 0;
     public static final int PATH_INDEX = 1;
     public static final int HISTORY_INDEX = 2;
+    public static final int AS_IP_INDEX = 3;
     public static final int CONTROL_INDEX = 8;
 
     private static final JedisPool jedisPool;
@@ -43,5 +44,9 @@ public class RedisPool {
 
     public static Jedis getControlConnection() {
         return getResource(CONTROL_INDEX);
+    }
+
+    public static Jedis getASIPConnection() {
+        return getResource(AS_IP_INDEX);
     }
 }
