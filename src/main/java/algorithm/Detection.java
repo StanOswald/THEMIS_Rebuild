@@ -79,8 +79,9 @@ public class Detection {
         String ip = redisMapper.getIP(ASn);
         try {
             InetAddress address = Inet4Address.getByName(ip);
-            return address.isReachable(2000);
+            return address.isReachable(1000);
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }
