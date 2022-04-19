@@ -1,3 +1,5 @@
+import checker.BasicChecker;
+import checker.ControlPlane;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -6,12 +8,9 @@ import process.DetectionResult;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class ControlPlaneTest {
     @Test
@@ -50,7 +49,7 @@ public class ControlPlaneTest {
 
         List<Integer> Ct = List.of(0, 0, 0, 0, 1, 0);
         List<Integer> Dt = List.of(1, 0, 0, 0, 0, 0);
-        
+
         double Ft = 0, _D = 0;
         if (Ct.contains(1) && Dt.contains(1)) {
             int sumCt = Ct.stream().reduce(Integer::sum).orElse(0);
@@ -83,4 +82,12 @@ public class ControlPlaneTest {
         boolean reachable = address.isReachable(10);
         assert reachable;
     }
+
+    @Test
+    public void getClassTest() {
+        BasicChecker controlPlane = new ControlPlane();
+        System.out.println(controlPlane.getClass().getSimpleName());
+    }
+
+
 }
