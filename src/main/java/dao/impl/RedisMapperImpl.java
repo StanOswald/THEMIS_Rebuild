@@ -7,6 +7,7 @@ import redis.clients.jedis.Jedis;
 import dao.RedisPool;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class RedisMapperImpl implements RedisMapper {
@@ -27,7 +28,7 @@ public class RedisMapperImpl implements RedisMapper {
         try (Jedis pathConn = RedisPool.getPathConnection()) {
             return pathConn.smembers(ASnL + "_" + ASnR).stream()
                     .map(Integer::parseInt).collect(Collectors.toList());
-        } catch (NullPointerException e) {
+        } catch (NoSuchElementException e) {
             return null;
         }
     }
@@ -37,7 +38,7 @@ public class RedisMapperImpl implements RedisMapper {
         try (Jedis historyConn = RedisPool.getHistoryConnection()) {
             return historyConn.smembers(srcASn + "_" + peerASn).stream()
                     .map(Integer::parseInt).collect(Collectors.toList());
-        } catch (NullPointerException e) {
+        } catch (NoSuchElementException e) {
             return null;
         }
     }
@@ -51,7 +52,7 @@ public class RedisMapperImpl implements RedisMapper {
     public boolean isAdjacent(int ASnX, int ASnY) {
         try (Jedis pathConn = RedisPool.getPathConnection()) {
             return (pathConn.hget(String.valueOf(ASnX), String.valueOf(ASnY)) != null);
-        } catch (NullPointerException e) {
+        } catch (NoSuchElementException e) {
             return false;
         }
     }
@@ -60,7 +61,7 @@ public class RedisMapperImpl implements RedisMapper {
     public String getIP(int ASn) {
         try (Jedis ASIPConn = RedisPool.getASIPConnection()) {
             return ASIPConn.smembers(String.valueOf(ASn)).iterator().next();
-        } catch (NullPointerException e) {
+        } catch (NoSuchElementException e) {
             return null;
         }
     }
