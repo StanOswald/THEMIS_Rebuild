@@ -17,8 +17,6 @@ public class ControlPlane extends Detection implements BasicChecker {
 
     @Override
     public DetectionResult hijackCheck(BGPMessage message) {
-        logger.info("Received message: " + message);
-
         List<Integer> path = message.getPath();
         int lastASn = path.get(path.size() - 1);
 
@@ -43,5 +41,10 @@ public class ControlPlane extends Detection implements BasicChecker {
                 return new DetectionResult().setResult(true).setType(1, 2, 3);
         }
         return new DetectionResult().setResult(false);
+    }
+
+    @Override
+    public String toString() {
+        return "ControlPlane{}";
     }
 }

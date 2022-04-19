@@ -27,4 +27,11 @@ public class DataPlane extends Detection implements BasicChecker {
         }
         return new DetectionResult().setResult(false);
     }
+
+    @Override
+    public String toString() {
+        return "DataPlane{" +
+                "threshold=" + threshold +
+                '}';
+    }
 }
