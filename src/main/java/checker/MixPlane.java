@@ -1,6 +1,8 @@
 package checker;
 
 import algorithm.Detection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import process.BGPMessage;
 import process.DetectionResult;
 
@@ -14,7 +16,7 @@ public class MixPlane extends Detection implements BasicChecker {
     double xThreshold, yThreshold, normalThreshold;
 
     public MixPlane(int T, double xThreshold, double yThreshold, double normalThreshold) {
-        this.T = T;
+        this.T = T * 1000;
         this.xThreshold = xThreshold;
         this.yThreshold = yThreshold;
         this.normalThreshold = normalThreshold;
@@ -39,6 +41,7 @@ public class MixPlane extends Detection implements BasicChecker {
             else
                 Dt.add(0);
         }
+
         if (Ct.size() != Dt.size()) {
             try {
                 throw new Exception("The C-plane and D-plane data length is not equal!");
@@ -68,9 +71,10 @@ public class MixPlane extends Detection implements BasicChecker {
             Ft = a / Math.sqrt(b * c);
         }
         DetectionResult result = new DetectionResult();
+
         if (xThreshold <= Ft && Ft < normalThreshold)
             return result.setResult(true).setType(1, 2, 3);
-        else if (-normalThreshold < Ft && Ft <= xThreshold)
+        else if (-normalThreshold < Ft && Ft <= -xThreshold)
             return result.setResult(true).setType(7);
         else if (-xThreshold < Ft && Ft < xThreshold)
             if (_D >= yThreshold)
@@ -78,5 +82,15 @@ public class MixPlane extends Detection implements BasicChecker {
             else
                 return result.setResult(true).setType(6);
         return result.setResult(false);
+    }
+
+    @Override
+    public String toString() {
+        return "MixPlane{" +
+                "T=" + T +
+                ", xThreshold=" + xThreshold +
+                ", yThreshold=" + yThreshold +
+                ", normalThreshold=" + normalThreshold +
+                '}';
     }
 }
