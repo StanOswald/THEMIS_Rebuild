@@ -16,16 +16,17 @@ public class DataPlane extends Detection implements BasicChecker {
 
     @Override
     public DetectionResult hijackCheck(BGPMessage message) {
+        DetectionResult result = new DetectionResult(this.getClass());
         int u = 0;
         List<Integer> path = message.getPath();
         for (Integer ASn : path) {
             if (!connectivityCheck(ASn)) {
                 u++;
                 if (u > threshold)
-                    return new DetectionResult().setResult(true).setType(6);
+                    return result.setResult(true);
             }
         }
-        return new DetectionResult().setResult(false);
+        return result.setResult(false);
     }
 
     @Override

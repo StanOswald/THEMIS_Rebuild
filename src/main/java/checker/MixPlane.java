@@ -1,8 +1,6 @@
 package checker;
 
 import algorithm.Detection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import process.BGPMessage;
 import process.DetectionResult;
 
@@ -24,6 +22,7 @@ public class MixPlane extends Detection implements BasicChecker {
 
     @Override
     public DetectionResult hijackCheck(BGPMessage message) {
+        DetectionResult result = new DetectionResult(this.getClass());
         List<Integer> path = message.getPath();
 
         List<Integer> Ct = new ArrayList<>();
@@ -49,7 +48,7 @@ public class MixPlane extends Detection implements BasicChecker {
                 e.printStackTrace();
             }
         }
-        double Ft = 0, _D = 0;
+        double Ft = 0, _D;
         if (Ct.contains(1) && Dt.contains(1)) {
             int sumCt = Ct.stream().reduce(Integer::sum).orElse(0);
             int sumDt = Dt.stream().reduce(Integer::sum).orElse(0);
@@ -70,17 +69,13 @@ public class MixPlane extends Detection implements BasicChecker {
 
             Ft = a / Math.sqrt(b * c);
         }
-        DetectionResult result = new DetectionResult();
 
         if (xThreshold <= Ft && Ft < normalThreshold)
-            return result.setResult(true).setType(1, 2, 3);
+            return result.setResult(true);
         else if (-normalThreshold < Ft && Ft <= -xThreshold)
-            return result.setResult(true).setType(7);
+            return result.setResult(true);
         else if (-xThreshold < Ft && Ft < xThreshold)
-            if (_D >= yThreshold)
-                return result.setResult(true).setType(7);
-            else
-                return result.setResult(true).setType(6);
+            return result.setResult(true);
         return result.setResult(false);
     }
 

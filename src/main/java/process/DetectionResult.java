@@ -1,75 +1,37 @@
 package process;
 
-import java.util.Arrays;
-import java.util.Date;
+import checker.BasicChecker;
 
 public class DetectionResult {
     Boolean result;
-    String victim;
-    Integer attacker;
-    int[] type;
-    Date time;
+    long timestamp;
+    Class<? extends BasicChecker> checker;
 
-    public DetectionResult() {
-        this.time = new Date();
+    public DetectionResult(Class<? extends BasicChecker> checker) {
+        timestamp = System.currentTimeMillis();
+        this.checker = checker;
     }
 
-    public DetectionResult(Boolean result, String victim, Integer attacker, int... type) {
-        this.result = result;
-        this.victim = victim;
-        this.attacker = attacker;
-        this.type = type;
-        this.time = new Date();
+    public boolean equals(boolean b) {
+        return b == result;
     }
 
     public DetectionResult setResult(Boolean result) {
+        timestamp = System.currentTimeMillis();
         this.result = result;
         return this;
     }
 
-    public DetectionResult setVictim(String victim) {
-        this.victim = victim;
-        return this;
-    }
-
-    public DetectionResult setAttacker(Integer attacker) {
-        this.attacker = attacker;
-        return this;
-    }
-
-    public DetectionResult setType(int... type) {
-        this.type = type;
-        return this;
-    }
-
-    public Boolean getResult() {
-        return result;
-    }
-
-    public String getVictim() {
-        return victim;
-    }
-
-    public Integer getAttacker() {
-        return attacker;
-    }
-
-    public int[] getType() {
-        return type;
-    }
-
-    public Date getTime() {
-        return time;
+    public Class<? extends BasicChecker> getChecker() {
+        return checker;
     }
 
     @Override
     public String toString() {
         return "DetectionResult{" +
                 "result=" + result +
-                ", victim='" + victim + '\'' +
-                ", attacker=" + attacker +
-                ", type=" + Arrays.toString(type) +
-                ", time=" + time.getTime() +
+                ", timestamp=" + timestamp +
+                ", checker=" + checker +
                 '}';
     }
 }
