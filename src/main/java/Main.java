@@ -1,3 +1,5 @@
+import adjudicator.BasicAdjudicator;
+import adjudicator.MajorityRuling;
 import adjudicator.MultimodeRuling;
 import checker.ControlPlane;
 import checker.DataPlane;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import process.BGPMessage;
 import process.DetectionResult;
 import process.DetectorProcess;
+import process.RulingResult;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -17,13 +20,9 @@ import redis.clients.jedis.resps.StreamEntry;
 import dao.RedisPool;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -65,11 +64,22 @@ public class Main {
                     List<DetectorProcess> detectorList = List.of(controlPlane, dataPlane, mixPlane);
 
                     List<Future<DetectionResult>> taskList = new ArrayList<>();
-                    detectorList.forEach(p -> taskList.add(pool.submit(p)));
+                    ArrayList<DetectionResult> resultList = new ArrayList<>();
 
-                    MultimodeRuling multimodeRuling = new MultimodeRuling();
-                    multimodeRuling.adjudicate(taskList);
+                    detectorList.forEach(detector -> taskList.add(pool.submit(detector)));
 
+                    taskList.forEach(task -> {
+                        try {
+                            resultList.add(task.get());
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+                    BasicAdjudicator adjudicator = new MajorityRuling();
+                    RulingResult ruling = adjudicator.ruling(resultList);
+
+                    System.out.println(ruling);
                 }
             }
         } catch (JedisConnectionException e) {
