@@ -13,7 +13,6 @@ public class DetectorProcess implements Callable<DetectionResult> {
     private final BasicChecker checker;
     private final BGPMessage message;
     private final String checkerName;
-    private Thread t;
 
     public DetectorProcess(BasicChecker checker, BGPMessage message) {
         this.checker = checker;

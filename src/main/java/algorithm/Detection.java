@@ -54,27 +54,6 @@ public class Detection {
         return true;
     }
 
-    protected List<Integer> findChangePoint(List<Integer> localPath, List<Integer> newPath) {
-        int localPathLen = localPath.size();
-        int newPathLen = newPath.size();
-
-        //Find the left change point
-        int left = 0;
-        while (left < localPathLen && left < newPathLen
-                && localPath.get(left).equals(newPath.get(left))) {
-            left++;
-        }
-
-        //Find the right change point
-        int right = -1;
-        while (right > -localPathLen && right > -newPathLen
-                && localPath.get(localPathLen + right).equals(newPath.get(newPathLen + right))) {
-            right--;
-        }
-        right += newPathLen;
-        return left == right ? List.of(newPath.get(left)) : newPath.subList(left, right + 1);
-    }
-
     protected boolean connectivityCheck(int ASn) {
         String ip = redisMapper.getIP(ASn);
         try {
