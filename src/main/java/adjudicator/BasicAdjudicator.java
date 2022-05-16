@@ -1,12 +1,10 @@
 package adjudicator;
 
 import process.DetectionResult;
+import process.RulingResult;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 public interface BasicAdjudicator {
-
-
-    DetectionResult adjudicate(List<Future<DetectionResult>> taskList);
+    RulingResult ruling(List<DetectionResult> dataList);
 }
