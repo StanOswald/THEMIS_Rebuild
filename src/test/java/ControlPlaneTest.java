@@ -1,9 +1,13 @@
+import adjudicator.MultimodeRuling;
 import checker.BasicChecker;
 import checker.ControlPlane;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import process.DetectionResult;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -13,26 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ControlPlaneTest {
-    @Test
-    public void test01() {
-        System.out.println(
-                new DetectionResult(
-                        true,
-                        null,
-                        null,
-                        1, 2, 3)
-        );
-
-        System.out.println(
-                new DetectionResult()
-                        .setResult(false)
-                        .setType(0, 1, 3)
-        );
-
-        int[] arr = {1, 2, 3, 4};
-        int size = arr.length;
-        System.out.println(arr[size + (-1)]);
-    }
 
     @Test
     public void jsonTest() throws JsonProcessingException {
@@ -61,10 +45,7 @@ public class ControlPlaneTest {
             List<Double> C = Ct.stream().map(n -> n - _C).collect(Collectors.toList());
             List<Double> D = Dt.stream().map(n -> n - final_D).collect(Collectors.toList());
 
-            double a = IntStream
-                    .range(0, C.size())
-                    .mapToDouble(i -> C.get(i) * D.get(i))
-                    .reduce(Double::sum).orElse(0.0);
+            double a = IntStream.range(0, C.size()).mapToDouble(i -> C.get(i) * D.get(i)).reduce(Double::sum).orElse(0.0);
 
             double b = C.stream().map(n -> n * n).reduce(Double::sum).orElse(0.0);
             double c = D.stream().map(n -> n * n).reduce(Double::sum).orElse(0.0);
@@ -87,6 +68,32 @@ public class ControlPlaneTest {
     public void getClassTest() {
         BasicChecker controlPlane = new ControlPlane();
         System.out.println(controlPlane.getClass().getSimpleName());
+    }
+
+    @Test
+    public void testRedisConnection() {
+        String testStr = "Test String";
+        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "192.168.186.128", 6379);
+        System.out.println("Pool initialized: " + jedisPool.hashCode());
+
+        Jedis resource = jedisPool.getResource();
+        System.out.println("Get connection: " + resource);
+
+        resource.lpush("test", testStr);
+        String res = resource.lpop("test");
+        System.out.println(testStr);
+
+        assert testStr.equals(res);
+        resource.close();
+        jedisPool.close();
+    }
+
+    @Test
+    public void testResIndexRes() {
+        MultimodeRuling multimodeRuling = new MultimodeRuling();
+        LinkedList<int[]> ints = multimodeRuling.resIndexPairs(4);
+
+        ints.forEach(s -> System.out.println(s[0] + "," + s[1]));
     }
 
 

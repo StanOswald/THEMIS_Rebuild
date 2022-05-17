@@ -34,13 +34,15 @@ public class DataCollector extends WebSocketClient {
                     "type": "ris_subscribe",
                     "data": {
                         "host": "rrc21",
-                        "path": 3356
+                        "type": "UPDATE",
+                        "require": "announcements"
                     }
                 }""");
     }
 
     @Override
     public void onMessage(String s) {
+        logger.info(s);
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode data = mapper.readTree(s).get("data");
@@ -53,7 +55,7 @@ public class DataCollector extends WebSocketClient {
             for (int i = 0; i < last; i++) {
                 int ASn = p.get(i);
                 int nextASn = p.get(i + 1);
-                pathConn.sadd(ASn + "_" + nextASn, p.toString());
+                // pathConn.sadd(ASn + "_" + nextASn, p.toString());
             }
         } catch (IOException | NullPointerException e) {
             logger.info(s);
