@@ -55,11 +55,6 @@
             <version>1.5.3</version>
         </dependency>
 
-        <!--<dependency>-->
-        <!--    <groupId>org.slf4j</groupId>-->
-        <!--    <artifactId>slf4j-nop</artifactId>-->
-        <!--    <version>1.7.36</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -86,6 +81,12 @@
             <artifactId>commons-net</artifactId>
             <version>3.8.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.seancfoley</groupId>
+            <artifactId>ipaddress</artifactId>
+            <version>5.3.4</version>
+        </dependency>
+
 
     </dependencies>
 
