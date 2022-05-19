@@ -1,10 +1,9 @@
-import adjudicator.MultimodeRuling;
+import algorithm.Detection;
 import checker.BasicChecker;
 import checker.ControlPlane;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
-import process.DetectionResult;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -12,11 +11,11 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ControlPlaneTest {
+public class DetectionTest extends Detection {
 
     @Test
     public void jsonTest() throws JsonProcessingException {
@@ -89,12 +88,9 @@ public class ControlPlaneTest {
     }
 
     @Test
-    public void testResIndexRes() {
-        MultimodeRuling multimodeRuling = new MultimodeRuling();
-        LinkedList<int[]> ints = multimodeRuling.resIndexPairs(4);
-
-        ints.forEach(s -> System.out.println(s[0] + "," + s[1]));
+    public void connectivityCheckTest() {
+        boolean b = connectivityCheck(4213);
+        System.out.println(b);
     }
-
 
 }

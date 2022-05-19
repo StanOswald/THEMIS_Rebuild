@@ -4,20 +4,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.RedisMapper;
 import dao.impl.RedisMapperImpl;
+import inet.ipaddr.AddressStringException;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Detection {
 
     private final RedisMapper redisMapper = new RedisMapperImpl();
+    static Logger logger = LoggerFactory.getLogger(Detection.class);
 
     protected List<String> getAnnouncedPrefixes(Integer ASn) {
         List<String> prefixesArr = new ArrayList<>();
@@ -55,14 +64,40 @@ public class Detection {
     }
 
     protected boolean connectivityCheck(int ASn) {
-        String ip = redisMapper.getIP(ASn);
-        try {
-            InetAddress address = Inet4Address.getByName(ip);
-            return address.isReachable(1000);
-        } catch (IOException e) {
-            e.printStackTrace();
+        List<String> announcedPrefixes = getAnnouncedPrefixes(ASn);
+        if (announcedPrefixes.size() == 0) {
+            logger.info("AS" + ASn + " not visible");
             return false;
         }
+        boolean awaitRes = false;
+        AtomicBoolean succeed = new AtomicBoolean(false);
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
+            for (String prefix : announcedPrefixes) {
+                IPAddress subnetAddr = new IPAddressString(prefix).toAddress();
+
+                for (IPAddress ip : subnetAddr.getIterable()) {
+                    InetAddress inet = ip.toInetAddress();
+                    new Thread(() -> {
+                        try {
+                            if (inet.isReachable(500)) {
+                                succeed.set(true);
+                                latch.countDown();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+
+                    if (succeed.get())
+                        break;
+                }
+            }
+            awaitRes = latch.await(5, TimeUnit.SECONDS);
+        } catch (AddressStringException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return succeed.get() || awaitRes;
     }
 
     protected boolean BGPCheck(List<Integer> path, List<String> prefixes) {
