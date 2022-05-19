@@ -46,7 +46,6 @@ public class Main {
 
                 //For each message in the received list
                 for (StreamEntry streamEntry : list.get(0).getValue()) {
-                    String msgId = streamEntry.getID().toString();
                     String msgJSON = streamEntry.getFields().get("msg");
 
                     //Deserialize message to object
@@ -54,11 +53,11 @@ public class Main {
                             .readerFor(BGPMessage.class)
                             .readValue(msgJSON);
 
-                    logger.info(msgId);
                     msgObj = msgObj.cleanLoops();
+                    logger.info(msgObj.toString());
 
                     DetectorProcess controlPlane = new DetectorProcess(new ControlPlane(), msgObj);
-                    DetectorProcess dataPlane = new DetectorProcess(new DataPlane(10), msgObj);
+                    DetectorProcess dataPlane = new DetectorProcess(new DataPlane((int) (msgObj.getPath().size() * 0.8)), msgObj);
                     DetectorProcess mixPlane = new DetectorProcess(new MixPlane(20, 0.3, 0.5, 0.9), msgObj);
 
                     List<DetectorProcess> detectorList = List.of(controlPlane, dataPlane, mixPlane);
