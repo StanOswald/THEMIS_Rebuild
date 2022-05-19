@@ -33,7 +33,6 @@ public class DataCollector extends WebSocketClient {
                 {
                     "type": "ris_subscribe",
                     "data": {
-                        "host": "rrc21",
                         "type": "UPDATE",
                         "require": "announcements"
                     }
@@ -55,7 +54,7 @@ public class DataCollector extends WebSocketClient {
             for (int i = 0; i < last; i++) {
                 int ASn = p.get(i);
                 int nextASn = p.get(i + 1);
-                // pathConn.sadd(ASn + "_" + nextASn, p.toString());
+                pathConn.sadd(ASn + "_" + nextASn, p.toString());
             }
         } catch (IOException | NullPointerException e) {
             logger.info(s);

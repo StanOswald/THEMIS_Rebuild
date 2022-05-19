@@ -88,9 +88,9 @@ public class DetectionTest extends Detection {
     }
 
     @Test
-    public void connectivityCheckTest() {
-        boolean b = connectivityCheck(4213);
-        System.out.println(b);
+    public void testConnectivityCheck() {
+        List.of(100, 200, 300, 400).forEach(
+                this::connectivityCheck
+        );
     }
-
 }
