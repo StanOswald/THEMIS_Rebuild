@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -63,11 +64,33 @@ public class Detection {
         return true;
     }
 
+    protected boolean isAdjacent(int ASnX, int ASnY) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        HashSet<Integer> set = new HashSet<>();
+        String baseUrl = ("https://stat.ripe.net/data/asn-neighbours/data.json?resource=AS%s");
+        String url = String.format(baseUrl, ASnY);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            HttpGet httpGet = new HttpGet(url);
+            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+                JsonNode neighboursNode = objectMapper
+                        .readTree(response.getEntity().getContent())
+                        .get("data").get("neighbours");
+
+                for (JsonNode neighbour : neighboursNode) {
+                    set.add(neighbour.get("asn").asInt());
+                }
+            }
+            return set.contains(ASnX);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     protected boolean connectivityCheck(int ASn) {
         List<String> announcedPrefixes = getAnnouncedPrefixes(ASn);
         if (announcedPrefixes.size() == 0) {
-            logger.info("AS" + ASn + " not visible");
-            return false;
+            return true;
         }
         boolean awaitRes = false;
         AtomicBoolean succeed = new AtomicBoolean(false);
@@ -75,7 +98,8 @@ public class Detection {
         try {
             for (String prefix : announcedPrefixes) {
                 IPAddress subnetAddr = new IPAddressString(prefix).toAddress();
-
+                if (subnetAddr.toString().contains(":"))
+                    continue;
                 for (IPAddress ip : subnetAddr.getIterable()) {
                     InetAddress inet = ip.toInetAddress();
                     new Thread(() -> {
@@ -106,8 +130,8 @@ public class Detection {
             return false;
 
         for (int i = 1; i < last; i++) {
-            if (!redisMapper.isAdjacent(path.get(i), path.get(i - 1))
-                    || !redisMapper.isPolicyRelativeCorrect(path.get(i), path.get(i - 1)))
+            if (!isAdjacent(path.get(i), path.get(i + 1))
+                    || !redisMapper.isPolicyRelativeCorrect(path.get(i), path.get(i + 1)))
                 return false;
         }
         return true;
