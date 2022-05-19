@@ -12,8 +12,6 @@ public interface RedisMapper {
 
     boolean isPolicyRelativeCorrect(int ASnX, int ASnY);
 
-    boolean isAdjacent(int ASnX, int ASnY);
-
     String getIP(int ASn);
 
     void setASAndIP(int ASn, String IP);

@@ -1,13 +1,24 @@
 package dao.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.RedisMapper;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import redis.clients.jedis.Jedis;
 import dao.RedisPool;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class RedisMapperImpl implements RedisMapper {
@@ -18,7 +29,6 @@ public class RedisMapperImpl implements RedisMapper {
             String path = ctrlConn.get(prefix);
             return new ObjectMapper().readerFor(List.class).readValue(path);
         } catch (JsonProcessingException | IllegalArgumentException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -46,15 +56,6 @@ public class RedisMapperImpl implements RedisMapper {
     @Override
     public boolean isPolicyRelativeCorrect(int ASnX, int ASnY) {
         return true;
-    }
-
-    @Override
-    public boolean isAdjacent(int ASnX, int ASnY) {
-        try (Jedis pathConn = RedisPool.getPathConnection()) {
-            return (pathConn.hget(String.valueOf(ASnX), String.valueOf(ASnY)) != null);
-        } catch (NoSuchElementException e) {
-            return false;
-        }
     }
 
     @Override
