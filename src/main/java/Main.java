@@ -53,28 +53,35 @@ public class Main {
                             .readerFor(BGPMessage.class)
                             .readValue(msgJSON);
 
+                    //Clean loop's path for message
                     msgObj = msgObj.cleanLoops();
                     logger.info(msgObj.toString());
 
+                    //Detector process initialized
                     DetectorProcess controlPlane = new DetectorProcess(new ControlPlane(), msgObj);
                     DetectorProcess dataPlane = new DetectorProcess(new DataPlane((int) (msgObj.getPath().size() * 0.8)), msgObj);
                     DetectorProcess mixPlane = new DetectorProcess(new MixPlane(20, 0.3, 0.5, 0.9), msgObj);
 
+                    //Add detectors to list
                     List<DetectorProcess> detectorList = List.of(controlPlane, dataPlane, mixPlane);
 
                     List<Future<DetectionResult>> taskList = new ArrayList<>();
                     ArrayList<DetectionResult> resultList = new ArrayList<>();
 
+                    //Submit every detection task to thread poll
+                    //and add Future to taskList to call the result
                     detectorList.forEach(detector -> taskList.add(pool.submit(detector)));
 
                     taskList.forEach(task -> {
                         try {
+                            //Obtain result from Future
                             resultList.add(task.get());
                         } catch (InterruptedException | ExecutionException e) {
                             e.printStackTrace();
                         }
                     });
 
+                    //Start adjudicate
                     BasicAdjudicator adjudicator = new MajorityRuling();
                     RulingResult ruling = adjudicator.ruling(resultList);
 
