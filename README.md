@@ -8,7 +8,7 @@ I STILL LOVE BGP, AND ... JAVA ?
 
 ## 检测流程
 
-![THEMIS](.\docs\img\THEMIS.jpg)
+![THEMIS](./docs/img/THEMIS.jpg)
 
 ## 配置准备
 
