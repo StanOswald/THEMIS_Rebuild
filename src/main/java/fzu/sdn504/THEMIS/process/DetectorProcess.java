@@ -1,14 +1,15 @@
-package process;
+package fzu.sdn504.THEMIS.process;
 
-import checker.BasicChecker;
+import fzu.sdn504.THEMIS.checker.BasicChecker;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
+@Slf4j
 public class DetectorProcess implements Callable<DetectionResult> {
 
-    Logger logger = LoggerFactory.getLogger(DetectorProcess.class);
 
     private final BasicChecker checker;
     private final BGPMessage message;
@@ -18,14 +19,14 @@ public class DetectorProcess implements Callable<DetectionResult> {
         this.checker = checker;
         this.message = message;
         checkerName = checker.getClass().getSimpleName();
-        logger.info(checkerName + " initialized: " + checker);
+        log.info(checkerName + " initialized: " + checker);
     }
 
     @Override
     public DetectionResult call() {
-        logger.info("Running " + checkerName + "...");
+        log.info("Running " + checkerName + "...");
         DetectionResult detectionResult = checker.hijackCheck(message);
-        logger.info("Received result from " + checkerName + ": " + detectionResult);
+        log.info("Received result from " + checkerName + ": " + detectionResult);
         return detectionResult;
     }
 }

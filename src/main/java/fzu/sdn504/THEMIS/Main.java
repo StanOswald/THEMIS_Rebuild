@@ -1,31 +1,31 @@
-import adjudicator.BasicAdjudicator;
-import adjudicator.MajorityRuling;
-import adjudicator.MultimodeRuling;
-import checker.ControlPlane;
-import checker.DataPlane;
-import checker.MixPlane;
+package fzu.sdn504.THEMIS;
+
+import fzu.sdn504.THEMIS.adjudicator.BasicAdjudicator;
+import fzu.sdn504.THEMIS.adjudicator.MajorityRuling;
+import fzu.sdn504.THEMIS.checker.ControlPlane;
+import fzu.sdn504.THEMIS.checker.DataPlane;
+import fzu.sdn504.THEMIS.checker.MixPlane;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import process.BGPMessage;
-import process.DetectionResult;
-import process.DetectorProcess;
-import process.RulingResult;
+import lombok.extern.slf4j.Slf4j;
+import fzu.sdn504.THEMIS.process.BGPMessage;
+import fzu.sdn504.THEMIS.process.DetectionResult;
+import fzu.sdn504.THEMIS.process.DetectorProcess;
+import fzu.sdn504.THEMIS.process.RulingResult;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.StreamEntryID;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.XReadGroupParams;
 import redis.clients.jedis.resps.StreamEntry;
-import dao.RedisPool;
+import fzu.sdn504.THEMIS.repository.RedisPool;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+@Slf4j
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     static ExecutorService pool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) {
@@ -41,8 +41,8 @@ public class Main {
 
             //Listening to new messages arrived (blocking)
             while ((list = resource.xreadGroup("jedis", "j1", blockParam, entryIDMap)) != null) {
-                logger.info("Received message from streams.");
-                logger.info("Message length: " + list.get(0).getValue().size());
+                log.info("Received message from streams.");
+                log.info("Message length: " + list.get(0).getValue().size());
 
                 //For each message in the received list
                 for (StreamEntry streamEntry : list.get(0).getValue()) {
@@ -55,7 +55,7 @@ public class Main {
 
                     //Clean loop's path for message
                     msgObj = msgObj.cleanLoops();
-                    logger.info(msgObj.toString());
+                    log.info(msgObj.toString());
 
                     //Detector process initialized
                     DetectorProcess controlPlane = new DetectorProcess(new ControlPlane(), msgObj);
@@ -89,10 +89,10 @@ public class Main {
                 }
             }
         } catch (JedisConnectionException e) {
-            logger.error("Failing to connect to Redis");
+            log.error("Failing to connect to Redis");
             e.printStackTrace();
         } catch (JsonProcessingException e) {
-            logger.error("BGP message parse error");
+            log.error("BGP message parse error");
             e.printStackTrace();
         }
     }

@@ -1,6 +1,6 @@
-package process;
+package fzu.sdn504.THEMIS.process;
 
-import checker.BasicChecker;
+import fzu.sdn504.THEMIS.checker.BasicChecker;
 
 import java.util.List;
 

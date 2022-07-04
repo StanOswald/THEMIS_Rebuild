@@ -1,4 +1,4 @@
-package process;
+package fzu.sdn504.THEMIS.process;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 

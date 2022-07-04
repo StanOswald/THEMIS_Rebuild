@@ -1,8 +1,8 @@
-package checker;
+package fzu.sdn504.THEMIS.checker;
 
-import algorithm.Detection;
-import process.BGPMessage;
-import process.DetectionResult;
+import fzu.sdn504.THEMIS.algorithm.Detection;
+import fzu.sdn504.THEMIS.process.BGPMessage;
+import fzu.sdn504.THEMIS.process.DetectionResult;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package checker;
+package fzu.sdn504.THEMIS.checker;
 
-import algorithm.Detection;
-import process.BGPMessage;
-import process.DetectionResult;
+import fzu.sdn504.THEMIS.algorithm.Detection;
+import fzu.sdn504.THEMIS.process.BGPMessage;
+import fzu.sdn504.THEMIS.process.DetectionResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,8 +56,8 @@ public class MixPlane extends Detection implements BasicChecker {
             _D = (double) sumDt / Dt.size();
             double final_D = _D;
 
-            List<Double> C = Ct.stream().map(n -> n - _C).collect(Collectors.toList());
-            List<Double> D = Dt.stream().map(n -> n - final_D).collect(Collectors.toList());
+            List<Double> C = Ct.stream().map(n -> n - _C).toList();
+            List<Double> D = Dt.stream().map(n -> n - final_D).toList();
 
             double a = IntStream
                     .range(0, C.size())

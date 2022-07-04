@@ -1,7 +1,7 @@
-package adjudicator;
+package fzu.sdn504.THEMIS.adjudicator;
 
-import process.DetectionResult;
-import process.RulingResult;
+import fzu.sdn504.THEMIS.process.DetectionResult;
+import fzu.sdn504.THEMIS.process.RulingResult;
 
 import java.util.LinkedList;
 import java.util.List;

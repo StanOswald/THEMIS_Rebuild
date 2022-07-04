@@ -1,8 +1,8 @@
-package adjudicator;
+package fzu.sdn504.THEMIS.adjudicator;
 
-import checker.BasicChecker;
-import process.DetectionResult;
-import process.RulingResult;
+import fzu.sdn504.THEMIS.checker.BasicChecker;
+import fzu.sdn504.THEMIS.process.DetectionResult;
+import fzu.sdn504.THEMIS.process.RulingResult;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
-package process;
+package fzu.sdn504.THEMIS.process;
 
-import checker.BasicChecker;
+import fzu.sdn504.THEMIS.checker.BasicChecker;
 
 public class DetectionResult {
     Boolean result;
@@ -31,7 +31,7 @@ public class DetectionResult {
         return "DetectionResult{" +
                 "result=" + result +
                 ", timestamp=" + timestamp +
-                ", checker=" + checker +
+                ", fzu.sdn504.THEMIS.checker=" + checker +
                 '}';
     }
 }

@@ -1,9 +1,9 @@
-package algorithm;
+package fzu.sdn504.THEMIS.algorithm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.RedisMapper;
-import dao.impl.RedisMapperImpl;
+import fzu.sdn504.THEMIS.repository.RedisMapper;
+import fzu.sdn504.THEMIS.repository.impl.RedisMapperJedisImpl;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Detection {
 
-    private final RedisMapper redisMapper = new RedisMapperImpl();
+    private final RedisMapper redisMapper = new RedisMapperJedisImpl();
     static Logger logger = LoggerFactory.getLogger(Detection.class);
 
     protected List<String> getAnnouncedPrefixes(Integer ASn) {

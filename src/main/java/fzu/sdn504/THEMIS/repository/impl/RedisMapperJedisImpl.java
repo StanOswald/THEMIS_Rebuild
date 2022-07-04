@@ -1,27 +1,16 @@
-package dao.impl;
+package fzu.sdn504.THEMIS.repository.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.RedisMapper;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
+import fzu.sdn504.THEMIS.repository.RedisMapper;
+import fzu.sdn504.THEMIS.repository.RedisPool;
 import redis.clients.jedis.Jedis;
-import dao.RedisPool;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RedisMapperImpl implements RedisMapper {
+public class RedisMapperJedisImpl implements RedisMapper {
 
     @Override
     public List<Integer> findLocalPath(String prefix) {

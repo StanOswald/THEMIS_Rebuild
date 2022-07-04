@@ -1,11 +1,11 @@
-package dao;
+package fzu.sdn504.THEMIS.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+@Slf4j
 public class RedisPool {
 
     public static final int BGP_MESSAGE_INDEX = 0;
@@ -15,12 +15,11 @@ public class RedisPool {
     public static final int CONTROL_INDEX = 8;
 
     private static final JedisPool jedisPool;
-    static Logger logger = LoggerFactory.getLogger(RedisPool.class);
 
     static {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPool = new JedisPool(jedisPoolConfig, "192.168.179.128", 6379);
-        logger.info("Jedis pool initialized.");
+        log.info("Jedis pool initialized.");
     }
 
     private static Jedis getResource(int index) {

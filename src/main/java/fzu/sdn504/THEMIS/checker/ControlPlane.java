@@ -1,16 +1,16 @@
-package checker;
+package fzu.sdn504.THEMIS.checker;
 
-import algorithm.Detection;
-import dao.RedisMapper;
-import dao.impl.RedisMapperImpl;
-import process.BGPMessage;
-import process.DetectionResult;
+import fzu.sdn504.THEMIS.algorithm.Detection;
+import fzu.sdn504.THEMIS.repository.RedisMapper;
+import fzu.sdn504.THEMIS.repository.impl.RedisMapperJedisImpl;
+import fzu.sdn504.THEMIS.process.BGPMessage;
+import fzu.sdn504.THEMIS.process.DetectionResult;
 
 import java.util.List;
 
 public class ControlPlane extends Detection implements BasicChecker {
 
-    private static final RedisMapper mapper = new RedisMapperImpl();
+    private static final RedisMapper mapper = new RedisMapperJedisImpl();
 
     @Override
     public DetectionResult hijackCheck(BGPMessage message) {

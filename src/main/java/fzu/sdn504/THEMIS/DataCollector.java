@@ -1,34 +1,35 @@
+package fzu.sdn504.THEMIS;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import process.BGPMessage;
+import fzu.sdn504.THEMIS.process.BGPMessage;
 import redis.clients.jedis.Jedis;
-import dao.RedisPool;
+import fzu.sdn504.THEMIS.repository.RedisPool;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+@Slf4j
 public class DataCollector extends WebSocketClient {
 
-    private final Logger logger = LoggerFactory.getLogger(DataCollector.class);
     private final Jedis pathConn = RedisPool.getPathConnection();
     private final Jedis histConn = RedisPool.getHistoryConnection();
 
     public DataCollector(URI serverUri) {
         super(serverUri);
-        logger.info("Data collector initialized, URI: " + serverUri);
+        log.info("Data collector initialized, URI: " + serverUri);
     }
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        logger.info("Websocket opened");
+        log.info("Websocket opened");
         this.send("""
                 {
                     "type": "ris_subscribe",
@@ -41,7 +42,7 @@ public class DataCollector extends WebSocketClient {
 
     @Override
     public void onMessage(String s) {
-        logger.info(s);
+        log.info(s);
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode data = mapper.readTree(s).get("data");
@@ -57,14 +58,14 @@ public class DataCollector extends WebSocketClient {
                 pathConn.sadd(ASn + "_" + nextASn, p.toString());
             }
         } catch (IOException | NullPointerException e) {
-            logger.info(s);
+            log.info(s);
             e.printStackTrace();
         }
     }
 
     @Override
     public void onClose(int i, String s, boolean b) {
-        logger.info("Websocket closed");
+        log.info("Websocket closed");
         histConn.close();
         pathConn.close();
     }
